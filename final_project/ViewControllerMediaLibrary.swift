@@ -135,9 +135,9 @@ class ViewControllerMediaLibrary: UIViewController, UITableViewDelegate, UITable
         let fileManager = FileManager.default
         let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         let destinationURL = documentsDirectory.appendingPathComponent(originalURL.lastPathComponent)
-        
+
         if fileManager.fileExists(atPath: destinationURL.path) {
-            print("⚠️ Video already exists: \(destinationURL.lastPathComponent)")
+            print("⚠️ Video already exists at: \(destinationURL.path)")
             return
         }
 
@@ -147,12 +147,21 @@ class ViewControllerMediaLibrary: UIViewController, UITableViewDelegate, UITable
                 self.mediaLibrary.append(destinationURL)
                 self.saveMediaLibrary()
                 self.tableView.reloadData()
-                print("✅ Video added: \(destinationURL.lastPathComponent)")
+                print("✅ Video successfully copied to: \(destinationURL.path)")
+
+                // Now add the video to the queue
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("VideoAddedToQueue"),
+                    object: destinationURL
+                )
             }
         } catch {
             print("❌ Error copying video: \(error)")
         }
     }
+
+
+
 
     // MARK: - Add Video to Queue
     
